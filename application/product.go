@@ -1,6 +1,9 @@
 package application
 
-import "errors"
+import (
+	"errors"
+	"github.com/google/uuid"
+)
 
 type ProductInterface interface {
 	IsValid() (bool, error)
@@ -13,33 +16,64 @@ type ProductInterface interface {
 }
 
 const (
-	DISABLE = "disable"
-	ENABLED = "enabled"
+	DISABLED = "disable"
+	ENABLED  = "enabled"
 )
 
 type Product struct {
-	ID string
-	Name string
-	Price float64
-	Status string
+	ID       uuid.UUID
+	Name     string
+	Price    float64
+	Status   string
+	Quantity int32
 }
 
-//func (p *Product) IsValid() (bool, error) {
-//
-//}
-//
+func (p *Product) IsValid() (bool, error) {
+	if p.Status == "" {
+		p.Status = DISABLED
+	}
+
+	if p.Status != ENABLED && p.Status != DISABLED {
+		return false, errors.New("status must be enabled or disabled")
+	}
+
+	if p.Price <= 0 {
+		return false, errors.New("price must be greater or equal zero")
+	}
+
+	if p.Quantity < 0 {
+		return false, errors.New("quantity must be greater zero")
+	}
+
+	if len(p.Name) <= 0 {
+		return false, errors.New("name cannot be empty")
+	}
+
+	if len(p.ID) <= 0 {
+		return false, errors.New("id cannot be empty")
+	}
+
+	return true, nil
+}
+
 func (p *Product) Enable() error {
-	if p.Price > 0 {
+	if p.Price > 0 && p.Quantity > 0 {
 		p.Status = ENABLED
 		return nil
 	}
-	return errors.New("product price must be greater than zero to enabled")
+	return errors.New("product price and quantity must be greater than zero to enabled")
 }
-//
-//func (p *Product) Disable() error {
-//}
 
-func (p *Product) GetID() string {
+func (p *Product) Disable() error {
+	if p.Quantity == 0 {
+		p.Status = DISABLED
+		p.Price = 0
+		return nil
+	}
+	return errors.New("product quantity equal 0 to disabled")
+}
+
+func (p *Product) GetID() uuid.UUID {
 	return p.ID
 }
 
@@ -53,4 +87,8 @@ func (p *Product) GetStatus() string {
 
 func (p *Product) GetPrice() float64 {
 	return p.Price
+}
+
+func (p *Product) GetQuantity() int32 {
+	return p.Quantity
 }

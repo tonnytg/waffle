@@ -8,6 +8,7 @@ import (
 	reflect "reflect"
 
 	gomock "github.com/golang/mock/gomock"
+	uuid "github.com/google/uuid"
 	application "github.com/tonnytg/waffle/application"
 )
 
@@ -63,10 +64,10 @@ func (mr *MockProductInterfaceMockRecorder) Enable() *gomock.Call {
 }
 
 // GetID mocks base method.
-func (m *MockProductInterface) GetID() string {
+func (m *MockProductInterface) GetID() uuid.UUID {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetID")
-	ret0, _ := ret[0].(string)
+	ret0, _ := ret[0].(uuid.UUID)
 	return ret0
 }
 
@@ -102,6 +103,20 @@ func (m *MockProductInterface) GetPrice() float64 {
 func (mr *MockProductInterfaceMockRecorder) GetPrice() *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetPrice", reflect.TypeOf((*MockProductInterface)(nil).GetPrice))
+}
+
+// GetQuantity mocks base method.
+func (m *MockProductInterface) GetQuantity() int32 {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetQuantity")
+	ret0, _ := ret[0].(int32)
+	return ret0
+}
+
+// GetQuantity indicates an expected call of GetQuantity.
+func (mr *MockProductInterfaceMockRecorder) GetQuantity() *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetQuantity", reflect.TypeOf((*MockProductInterface)(nil).GetQuantity))
 }
 
 // GetStatus mocks base method.

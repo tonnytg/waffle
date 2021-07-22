@@ -9,10 +9,11 @@ type ProductInterface interface {
 	IsValid() (bool, error)
 	Enable() error
 	Disable() error
-	GetID() string
+	GetID() uuid.UUID
 	GetName() string
 	GetStatus() string
 	GetPrice() float64
+	GetQuantity() int32
 }
 
 type ProductServiceInterface interface {

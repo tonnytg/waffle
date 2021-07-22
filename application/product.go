@@ -15,6 +15,26 @@ type ProductInterface interface {
 	GetPrice() float64
 }
 
+type ProductServiceInterface interface {
+	Get(id string) (ProductInterface, error)
+	Create(name string, price float64) (ProductInterface, error)
+	Enable(product ProductInterface) (ProductInterface, error)
+	Disable(product ProductInterface) (ProductInterface, error)
+}
+
+type ProductReader interface {
+	Get(id string) (ProductInterface, error)
+}
+
+type ProductWrite interface {
+	Save(product ProductInterface) (ProductInterface, error)
+}
+
+type ProductPersistenceInterface interface {
+	ProductReader
+	ProductWrite
+}
+
 const (
 	DISABLED = "disable"
 	ENABLED  = "enabled"
@@ -26,6 +46,14 @@ type Product struct {
 	Price    float64
 	Status   string
 	Quantity int32
+}
+
+func NewProduct() *Product {
+	product := Product{
+		ID:     uuid.New(),
+		Status: DISABLED,
+	}
+	return &product
 }
 
 func (p *Product) IsValid() (bool, error) {

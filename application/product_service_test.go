@@ -20,11 +20,60 @@ func TestProductService_Get(t *testing.T) {
 		Persistence: persistence,
 	}
 
-	result, err := service.Get("abc")
+	result, err := service.Get("foo")
 	if err != nil {
 		t.Error(err)
 	}
 	if result != product {
 		t.Error("result must be equal to product")
+	}
+}
+
+func TestProductService_Create(t *testing.T) {
+	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
+
+	product := mock_application.NewMockProductInterface(ctrl)
+	persistence := mock_application.NewMockProductPersistenceInterface(ctrl)
+	persistence.EXPECT().Save(gomock.Any()).Return(product, nil).AnyTimes()
+
+	service := application.ProductService{
+		Persistence: persistence,
+	}
+
+	result, err := service.Create("foo bar", 10)
+	if err != nil {
+		t.Error("service create broken")
+	}
+
+	if result != product {
+		t.Error("result must be equal product")
+	}
+}
+
+func TestProductService_EnableDisable(t *testing.T) {
+	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
+
+	product := mock_application.NewMockProductInterface(ctrl)
+	persistence := mock_application.NewMockProductPersistenceInterface(ctrl)
+	persistence.EXPECT().Save(gomock.Any()).Return(product, nil).AnyTimes()
+
+	service := application.ProductService{
+		Persistence: persistence,
+	}
+
+	result, err := service.Enable(product)
+	if err != nil {
+		t.Error("product can't be enabled")
+	}
+
+	result, err = service.Disable(product)
+	if err != nil {
+		t.Error("product can't be enabled")
+	}
+
+	if result != product {
+		t.Error("result must be equal product")
 	}
 }

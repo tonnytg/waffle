@@ -2,6 +2,7 @@ package db
 
 import (
 	"database/sql"
+	_ "github.com/mattn/go-sqlite3"
 	"github.com/tonnytg/waffle/application"
 )
 
@@ -15,14 +16,60 @@ func NewProductDb(db *sql.DB) *ProductDb {
 
 func (p *ProductDb) Get(id string) (application.ProductInterface, error) {
 	var product application.Product
-	stmt, err := p.db.Prepare("select id, name, price, status, quantity from waffles where id=?")
+	stmt, err := p.db.Prepare("select id, name, price, status from waffles where id=?")
 	if err != nil {
 		return nil, err
 	}
-
-	err = stmt.QueryRow(id).Scan(&product.ID, &product.Name, &product.Price, &product.Status, &product.Quantity)
+	err = stmt.QueryRow(id).Scan(&product.ID, &product.Name, &product.Price, &product.Status)
 	if err != nil {
 		return nil, err
 	}
 	return &product, nil
+}
+
+func (p *ProductDb) Save(product application.ProductInterface) (application.ProductInterface, error) {
+	var rows int
+	p.db.QueryRow("Select id from waffles where id=?", product.GetID()).Scan(&rows)
+	if rows == 0 {
+		_, err := p.create(product)
+		if err != nil {
+			return nil, err
+		}
+	} else {
+		_, err := p.update(product)
+		if err != nil {
+			return nil, err
+		}
+	}
+	return product, nil
+}
+
+func (p *ProductDb) create(product application.ProductInterface) (application.ProductInterface, error) {
+	stmt, err := p.db.Prepare(`insert into waffles(id, name, price, status) values(?,?,?,?)`)
+	if err != nil {
+		return nil, err
+	}
+	_, err = stmt.Exec(
+		product.GetID(),
+		product.GetName(),
+		product.GetPrice(),
+		product.GetStatus(),
+	)
+	if err != nil {
+		return nil, err
+	}
+	err = stmt.Close()
+	if err != nil {
+		return nil, err
+	}
+	return product, nil
+}
+
+func (p *ProductDb) update(product application.ProductInterface) (application.ProductInterface, error) {
+	_, err := p.db.Exec("update waffles set name = ?, price=?, status=? where id = ?",
+		product.GetName(), product.GetPrice(), product.GetStatus(), product.GetID())
+	if err != nil {
+		return nil, err
+	}
+	return product, nil
 }

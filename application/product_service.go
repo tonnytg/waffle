@@ -1,9 +1,16 @@
 package application
 
-import "errors"
+import (
+	"errors"
+	"log"
+)
 
 type ProductService struct {
 	Persistence ProductPersistenceInterface
+}
+
+func NewProductService(persistence ProductPersistenceInterface) *ProductService {
+	return &ProductService{Persistence: persistence}
 }
 
 func (s *ProductService) Get(id string) (ProductInterface, error) {
@@ -23,6 +30,7 @@ func (s *ProductService) Create(name string, price float64) (ProductInterface, e
 	product := NewProduct()
 	product.Name = name
 	product.Price = price
+	log.Println("create: gen productID:", product.ID)
 	_, err := product.IsValid()
 	if err != nil {
 		return &Product{}, err
@@ -55,6 +63,21 @@ func (s *ProductService) Disable(product ProductInterface) (ProductInterface, er
 
 	result, err := s.Persistence.Save(product)
 	if err != nil {
+		return &Product{}, err
+	}
+	return result, nil
+}
+
+func (s *ProductService) SetQuantity(product ProductInterface, q int32) (ProductInterface, error) {
+	err := product.SetQuantity(q)
+	if err != nil {
+		log.Println("set quantity:", err)
+		return &Product{}, err
+	}
+
+	result, err := s.Persistence.Save(product)
+	if err != nil {
+		log.Println("set quantity save:", err)
 		return &Product{}, err
 	}
 	return result, nil

@@ -5,6 +5,7 @@ import (
 	"github.com/google/uuid"
 	_ "github.com/mattn/go-sqlite3"
 	"github.com/tonnytg/waffle/adapters/db"
+	"github.com/tonnytg/waffle/application"
 	"log"
 	"testing"
 )
@@ -68,6 +69,48 @@ func TestProductDb_Get(t *testing.T) {
 	}
 	if product.GetStatus() != "disabled" {
 		t.Error("status must be equal disabled")
+	}
+}
+
+func TestProductDb_Save(t *testing.T) {
+	setUp()
+	defer Db.Close()
+
+	productDb := db.NewProductDb(Db)
+	product := application.NewProduct()
+	product.Name = "bar"
+	product.Price = 0
+
+	// test disabled product at create
+	productResult, err := productDb.Save(product)
+	if err != nil {
+		t.Error(err)
+	}
+	if product.Name != productResult.GetName() {
+		t.Error("product name must be equal productResult.GetName")
+	}
+	if product.Price != productResult.GetPrice() {
+		t.Error("product price must be equal 0")
+	}
+	if product.Status != productResult.GetStatus() {
+		t.Error("product status must be equal disabled")
+	}
+
+	// test enabled product at update
+	product.Status = "enabled"
+	product.Price = 25
+	productResult, err = productDb.Save(product)
+	if err != nil {
+		t.Error(err)
+	}
+	if product.Name != productResult.GetName() {
+		t.Error("product name must be equal productResult.GetName")
+	}
+	if product.Price != productResult.GetPrice() {
+		t.Error("product price must be equal 25")
+	}
+	if product.Status != productResult.GetStatus() {
+		t.Error("product status must be equal enabled")
 	}
 
 }

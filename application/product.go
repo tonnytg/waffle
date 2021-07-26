@@ -14,6 +14,7 @@ type ProductInterface interface {
 	GetStatus() string
 	GetPrice() float64
 	GetQuantity() int32
+	SetQuantity(q int32) error
 }
 
 type ProductServiceInterface interface {
@@ -121,4 +122,12 @@ func (p *Product) GetPrice() float64 {
 
 func (p *Product) GetQuantity() int32 {
 	return p.Quantity
+}
+
+func (p *Product) SetQuantity(q int32) error {
+	if q > 0 {
+		p.Quantity = q
+		return nil
+	}
+	return errors.New("product quantity must be granter than zero")
 }

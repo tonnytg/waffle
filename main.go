@@ -15,8 +15,18 @@ func main() {
 	productDbAdapter := db.NewProductDb(conn)
 	productService := application.NewProductService(productDbAdapter)
 
-	_, err = productService.Create("foo bar", 25.0)
+	product, err := productService.Create("foo bar", 25.0)
 	if err != nil {
 		log.Print("create: ", err)
+	}
+	// update quantity
+	_, err = productService.SetQuantity(product, 11)
+	if err != nil {
+		log.Print("update: quantity", err)
+	}
+	// update status
+	_, err = productService.Enable(product)
+	if err != nil {
+		log.Print("update: enabled", err)
 	}
 }

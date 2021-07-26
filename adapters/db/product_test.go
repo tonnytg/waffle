@@ -56,11 +56,11 @@ func TestProductDb_Get(t *testing.T) {
 		t.Error(err)
 	}
 
-	resultuuid, err := uuid.Parse("123e4567-e89b-12d3-a456-426614174000")
+	resultUuid, err := uuid.Parse("123e4567-e89b-12d3-a456-426614174000")
 	if err != nil {
 		t.Error("ID invalid format to parse to uuid")
 	}
-	if product.GetID() != resultuuid {
+	if product.GetID() != resultUuid {
 		t.Error("ID must be equal 123e4567-e89b-12d3-a456-426614174000")
 	}
 	if product.GetPrice() != 0.0 {

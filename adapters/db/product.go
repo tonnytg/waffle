@@ -2,8 +2,8 @@ package db
 
 import (
 	"database/sql"
-	_ "github.com/mattn/go-sqlite3"
 	"github.com/tonnytg/waffle/application"
+	"log"
 )
 
 type ProductDb struct {
@@ -16,11 +16,12 @@ func NewProductDb(db *sql.DB) *ProductDb {
 
 func (p *ProductDb) Get(id string) (application.ProductInterface, error) {
 	var product application.Product
-	stmt, err := p.db.Prepare("select id, name, price, status from waffles where id=?")
+	stmt, err := p.db.Prepare("select id, name, price, quantity, status from waffles where id=?")
 	if err != nil {
 		return nil, err
 	}
-	err = stmt.QueryRow(id).Scan(&product.ID, &product.Name, &product.Price, &product.Status)
+
+	err = stmt.QueryRow(id).Scan(&product.ID, &product.Name, &product.Price, &product.Quantity, &product.Status)
 	if err != nil {
 		return nil, err
 	}
@@ -29,7 +30,7 @@ func (p *ProductDb) Get(id string) (application.ProductInterface, error) {
 
 func (p *ProductDb) Save(product application.ProductInterface) (application.ProductInterface, error) {
 	var rows int
-	p.db.QueryRow("Select id from waffles where id=?", product.GetID()).Scan(&rows)
+	p.db.QueryRow("Select id from products where id=?", product.GetID()).Scan(&rows)
 	if rows == 0 {
 		_, err := p.create(product)
 		if err != nil {
@@ -45,14 +46,20 @@ func (p *ProductDb) Save(product application.ProductInterface) (application.Prod
 }
 
 func (p *ProductDb) create(product application.ProductInterface) (application.ProductInterface, error) {
-	stmt, err := p.db.Prepare(`insert into waffles(id, name, price, status) values(?,?,?,?)`)
+
+	log.Println("create: db insert:", product.GetID())
+	stmt, err := p.db.Prepare(`insert into waffles values ($1, $2, $3, $4, $5)`)
+	// insert into waffles (id, name, price, quantity, status) values ('123e4567-e89b-12d3-a456-426614174000', 'test', 0.0, 1, 'disabled');
 	if err != nil {
+		log.Println("stmt: insert:", stmt)
 		return nil, err
 	}
+
 	_, err = stmt.Exec(
 		product.GetID(),
 		product.GetName(),
 		product.GetPrice(),
+		product.GetQuantity(),
 		product.GetStatus(),
 	)
 	if err != nil {
@@ -62,12 +69,14 @@ func (p *ProductDb) create(product application.ProductInterface) (application.Pr
 	if err != nil {
 		return nil, err
 	}
+	log.Println("create: success", product.GetID())
 	return product, nil
 }
 
 func (p *ProductDb) update(product application.ProductInterface) (application.ProductInterface, error) {
-	_, err := p.db.Exec("update waffles set name = ?, price=?, status=? where id = ?",
-		product.GetName(), product.GetPrice(), product.GetStatus(), product.GetID())
+	log.Println("update: product id:", product.GetID())
+	_, err := p.db.Exec("update waffles set name = ?, price = ?, quantity = ?, status = ? where id = ?",
+		product.GetName(), product.GetPrice, product.GetQuantity(), product.GetStatus(), product.GetID())
 	if err != nil {
 		return nil, err
 	}

@@ -37,7 +37,7 @@ type ProductPersistenceInterface interface {
 }
 
 const (
-	DISABLED = "disable"
+	DISABLED = "disabled"
 	ENABLED  = "enabled"
 )
 
@@ -51,8 +51,9 @@ type Product struct {
 
 func NewProduct() *Product {
 	product := Product{
-		ID:     uuid.New(),
-		Status: DISABLED,
+		ID:       uuid.New(),
+		Status:   DISABLED,
+		Quantity: 0,
 	}
 	return &product
 }

@@ -2,6 +2,7 @@ package db_test
 
 import (
 	"database/sql"
+	"github.com/google/uuid"
 	_ "github.com/mattn/go-sqlite3"
 	"github.com/tonnytg/waffle/adapters/db"
 	"log"
@@ -55,7 +56,18 @@ func TestProductDb_Get(t *testing.T) {
 		t.Error(err)
 	}
 
-	if 0.0 != product.GetPrice() {
+	resultuuid, err := uuid.Parse("123e4567-e89b-12d3-a456-426614174000")
+	if err != nil {
+		t.Error("ID invalid format to parse to uuid")
+	}
+	if product.GetID() != resultuuid {
+		t.Error("ID must be equal 123e4567-e89b-12d3-a456-426614174000")
+	}
+	if product.GetPrice() != 0.0 {
 		t.Error("price must be equal 0")
 	}
+	if product.GetStatus() != "disabled" {
+		t.Error("status must be equal disabled")
+	}
+
 }

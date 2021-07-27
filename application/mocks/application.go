@@ -148,6 +148,20 @@ func (mr *MockProductInterfaceMockRecorder) IsValid() *gomock.Call {
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "IsValid", reflect.TypeOf((*MockProductInterface)(nil).IsValid))
 }
 
+// SetQuantity mocks base method.
+func (m *MockProductInterface) SetQuantity(q int32) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "SetQuantity", q)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// SetQuantity indicates an expected call of SetQuantity.
+func (mr *MockProductInterfaceMockRecorder) SetQuantity(q interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SetQuantity", reflect.TypeOf((*MockProductInterface)(nil).SetQuantity), q)
+}
+
 // MockProductServiceInterface is a mock of ProductServiceInterface interface.
 type MockProductServiceInterface struct {
 	ctrl     *gomock.Controller

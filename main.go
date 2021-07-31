@@ -45,5 +45,10 @@ func main() {
 		if err != nil {
 			log.Print("update: enabled", err)
 		}
+		product, err = productService.Get("133e4567-e89b-12d3-a456-426614174000")
+		if err != nil {
+			log.Println("update: enabled", err)
+		}
+		log.Println("waffle:", product)
 	}
 }

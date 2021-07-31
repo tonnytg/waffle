@@ -15,10 +15,12 @@ func NewProductDb(db *sql.DB) *ProductDb {
 
 func (p *ProductDb) Get(id string) (application.ProductInterface, error) {
 	var product application.Product
-	stmt, err := p.db.Prepare("select id, name, price, quantity, status from waffles where id=?")
+	stmt, err := p.db.Prepare("select id, name, price, quantity, status from waffles where id=$1")
 	if err != nil {
 		return nil, err
 	}
+	defer stmt.Close()
+
 	err = stmt.QueryRow(id).Scan(&product.ID, &product.Name, &product.Price, &product.Quantity, &product.Status)
 	if err != nil {
 		return nil, err

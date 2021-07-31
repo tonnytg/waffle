@@ -45,7 +45,8 @@ func main() {
 		if err != nil {
 			log.Print("update: enabled", err)
 		}
-		product, err = productService.Get("133e4567-e89b-12d3-a456-426614174000")
+		id := product.GetID().String()
+		product, err = productService.Get(id)
 		if err != nil {
 			log.Println("update: enabled", err)
 		}
